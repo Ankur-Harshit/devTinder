@@ -21,7 +21,50 @@ app.post("/signup", async(req, res)=>{
         res.status(400).send("Cannot Add User");
     }
 })
+// How to get user details //
 
+app.get("/user", async (req,res)=>{
+    const userEmail = req.body.emailId;
+    try{
+        const user = await User.find({emailId : userEmail});
+        if(user.length===0) res.send("Cannot Find User"); // when not found it sends an array of length 0 //
+        else
+        res.send(user);
+    }
+    catch (err){
+        res.status(400).send("Something went wrong");
+    }
+})
+
+// get user by the ID //
+
+app.get("/userId", async (req,res)=>{
+    const userId = req.body._id;
+    try{
+        const user = await User.find({_id : userId});
+        if(user.length===0) res.send("Cannot Find User");
+        else
+        res.send(user);
+    }
+    catch (err){
+        res.status(400).send("Something went wrong");
+    }
+})
+
+// Feed API //
+
+app.get("/feed", async (req,res)=>{
+    const userEmail = req.body.emailId;
+    try{
+        const user = await User.find({});
+        if(user.length===0) res.send("Cannot Find User"); // when not found it sends an array of length 0 //
+        else
+        res.send(user);
+    }
+    catch (err){
+        res.status(400).send("Something went wrong");
+    }
+})
 
 connectDB().then(()=>{
     console.log("Connection Established Done");
