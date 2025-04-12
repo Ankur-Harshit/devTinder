@@ -54,7 +54,7 @@ app.get("/userId", async (req,res)=>{
 // Feed API //
 
 app.get("/feed", async (req,res)=>{
-    const userEmail = req.body.emailId;
+    //const userEmail = req.body.emailId;
     try{
         const user = await User.find({});
         if(user.length===0) res.send("Cannot Find User"); // when not found it sends an array of length 0 //
@@ -65,6 +65,37 @@ app.get("/feed", async (req,res)=>{
         res.status(400).send("Something went wrong");
     }
 })
+
+
+// Deleting From the Database
+app.delete("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    try{
+        const user = await User.findByIdAndDelete({_id : userId});
+        // const user = await User.findByIdAndDelete(userId); // this can also be used directly as it is specified that it DeleteUserByID //
+        res.send("User Deleted Successfuly");
+    }
+    catch (err){
+        res.status(400).send("Something went wrong");
+    }
+})
+
+// Updating from The DataBase //
+
+app.patch("/user", async (req,res)=>{
+    const userId = req.body.userId;
+    const data = req.body;
+    console.log(data);
+
+    try{
+        await User.findByIdAndUpdate({_id : userId}, data);
+        res.send("User Updated Successfuly");
+    }
+    catch (err){
+        res.status(400).send("Something went wrong");
+    }
+})
+
 
 connectDB().then(()=>{
     console.log("Connection Established Done");
