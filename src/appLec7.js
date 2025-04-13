@@ -18,7 +18,7 @@ app.post("/signup", async(req, res)=>{
         await user.save();
         res.send("User Added");
     }catch(error){
-        res.status(400).send("Cannot Add User");
+        res.status(400).send(error.message);
     }
 })
 // How to get user details //
@@ -88,11 +88,13 @@ app.patch("/user", async (req,res)=>{
     console.log(data);
 
     try{
-        await User.findByIdAndUpdate({_id : userId}, data);
+        await User.findByIdAndUpdate({_id : userId}, data, {
+            runValidators: true,
+        });
         res.send("User Updated Successfuly");
     }
     catch (err){
-        res.status(400).send("Something went wrong");
+        res.status(400).send(err.message);
     }
 })
 
