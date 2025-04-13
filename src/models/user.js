@@ -1,7 +1,8 @@
 // always try to add proper validations in the fields of the database //
 // Users should not be able to randomly enter the stuffs //
+// Never Trust req.body //
 
-const validator = require(validator);
+const validator = require('validator');
 const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
     firstName:{

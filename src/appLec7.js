@@ -4,23 +4,73 @@ const express = require('express');
 const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
+const bcrypt = require("bcrypt");
+const {validateSignUpData} = require("./utils/validation");
+const validator = require("validator");
 
 // express has the middleware json to covert the incoming json to use it.
 // this use will be handled for all the routes as we are not providing any specific route.
 
 app.use(express.json());
+// sign up API //
 app.post("/signup", async(req, res)=>{
     // console.log(req.body); // we cannot directly use req, so use express json middleware
 
+    //1. Validate the Data
+    //2. Encrypt the Password
+    //3. ADD the user into the data base
 
-    const user = new User(req.body);
     try{
+        validateSignUpData(req);
+        const {firstName, lastName, emailId, password} = req.body;
+        //encrypt the passsword//
+        const passswordHash = await bcrypt.hash(password, 10);
+        console.log(passswordHash);
+        //const user = new User(req.body); bad way of creating user data //
+        const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            password: passswordHash,
+        });
         await user.save();
         res.send("User Added");
     }catch(error){
         res.status(400).send(error.message);
     }
 })
+
+// Login API //
+
+app.post("/login", async(req, res)=>{
+
+    try{
+        const {emailId, password} = req.body;
+        if(emailId !== emailId.toLowerCase()){
+            throw new Error("Email should be in lowercase only.");
+        }
+        if(!validator.isEmail(emailId)){
+            throw new Error("Please Enter a valid Email");
+        }
+        const user = await User.findOne({emailId : emailId});
+        if(!user){
+            throw new Error("Invalid Credentials");
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(isPasswordValid){
+            res.send("Login Successful!");
+        }
+        else{
+            throw new Error("Invalid credentials");
+        }
+    }
+    catch(error){
+        res.status(400).send(error.message);
+    }
+})
+
+
 // How to get user details //
 
 app.get("/user", async (req,res)=>{
