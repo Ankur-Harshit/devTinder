@@ -9,6 +9,7 @@ const {validateSignUpData} = require("./utils/validation");
 const validator = require("validator");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const {userAuth} = require("./middlewares/auth");
 
 // express has the middleware json to covert the incoming json to use it.
 // this use will be handled for all the routes as we are not providing any specific route.
@@ -61,7 +62,9 @@ app.post("/login", async(req, res)=>{
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if(isPasswordValid){
-            const token = await jwt.sign({_id: user._id}, "DEV@Tinder$790");
+            const token = await jwt.sign({_id: user._id}, "DEV@Tinder$790", 
+                {expiresIn: "1d"}
+            );
             console.log(token);
             res.cookie("token", token);
             res.send("Login Successful!");
@@ -77,34 +80,45 @@ app.post("/login", async(req, res)=>{
 
 // profile API
 
-app.get("/profile", async(req, res)=>{
+app.get("/profile", userAuth, async(req, res)=>{
     try {
-        const cookies = req.cookies;
-        const { token } = cookies;
-        if(!token){
-            throw new Error("Invalid Token");
-        }
+        // const cookies = req.cookies;
+        // const { token } = cookies;
+        // if(!token){
+        //     throw new Error("Invalid Token");
+        // }
 
         // validate the token //
-        const decodedMessage = jwt.verify(token, "DEV@Tinder$790");
-        console.log(decodedMessage);
-        const { _id } = decodedMessage;
-        console.log("ID of the logged in User is " + _id);
-        const user = await User.findById(_id);
-        if(!user){
-            throw new Error("User does Not exist");
-        }
+        // const decodedMessage = jwt.verify(token, "DEV@Tinder$790");
+        // console.log(decodedMessage);
+        // const { _id } = decodedMessage;
+        // console.log("ID of the logged in User is " + _id);
+
+        // in the auth middleware, we have already find the user, so no need to find here //
+        // in the auth itself, we will attach user to the requesr //
+        const user = req.user;
+        // if(!user){
+        //     throw new Error("User does Not exist");
+        // }
         console.log(user.firstName + " is Logged in");
 
 
         // to read a cookie, we need a cookie parser //
-        console.log(cookies);
+        //console.log(cookies);
         res.send(user);
     }
     catch(error){
         res.status(400).send(error.message);
     }
     
+})
+
+// coonection request API //
+
+app.post("/sendConnectionRequest", userAuth, async(req,res)=>{
+    const user = req.user;
+    console.log("Sending a connection request");
+    res.send(user.firstName+" Sent a connection Request!");
 })
 
 
