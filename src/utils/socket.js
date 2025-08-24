@@ -3,7 +3,7 @@ const socket = require("socket.io");
 const initializeSocket = (server) => {
     const io = socket(server, {
         cors: {
-            origin: "*", // allow both dev + prod
+            origin: ["http://localhost:5173", "http://localhost:3000", "http://pullrequest.online", "https://www.pullrequest.online"], // allow both dev + prod
             methods: ["GET", "POST"],
             credentials: true,
         },
