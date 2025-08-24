@@ -12,11 +12,13 @@ const initializeSocket = (server) => {
         // Handle Events //
         socket.on("joinChat", ({firstName, userId, targetUserId, time})=>{
             // now we need to create roomm, every chat have a unique room
+            console.log(firstName);
             const roomId = [userId, targetUserId].sort().join("_");
             socket.join(roomId);
         });
 
         socket.on("sendMessage", ({firstName,userId, targetUserId, text, time,})=>{
+            console.log(firstName);
             const roomId = [userId, targetUserId].sort().join("_");
             io.to(roomId).emit("messageRecieved", {firstName, text, userId, time,});
         });
