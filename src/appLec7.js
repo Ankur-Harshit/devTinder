@@ -10,6 +10,8 @@ const profileRouter = require('./routes/profile');
 const requestRouter = require('./routes/request');
 const userRouter = require('./routes/user');
 const cors = require('cors');
+const http = require('http');
+const initializeSocket = require("./utils/socket");
 // express has the middleware json to covert the incoming json to use it.
 // this use will be handled for all the routes as we are not providing any specific route.
 app.use(cookieParser());
@@ -36,9 +38,12 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
+const server = http.createServer(app);
+initializeSocket(server);
+
 connectDB().then(()=>{
     console.log("Connection Established Done");
-    app.listen(3000, ()=>{
+    server.listen(3000, ()=>{
         console.log("Server is sucessfully listening on port 3000...");
     })
 }).catch((err)=>{
