@@ -12,6 +12,7 @@ const userRouter = require('./routes/user');
 const cors = require('cors');
 const http = require('http');
 const initializeSocket = require("./utils/socket");
+const chatRouter = require("./routes/chat");
 // express has the middleware json to covert the incoming json to use it.
 // this use will be handled for all the routes as we are not providing any specific route.
 app.use(cookieParser());
@@ -37,6 +38,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
 
 const server = http.createServer(app);
 initializeSocket(server);
